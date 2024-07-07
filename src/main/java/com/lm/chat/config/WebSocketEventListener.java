@@ -1,7 +1,7 @@
 package com.lm.chat.config;
 
-import com.lm.chat.model.Mensagem;
-import com.lm.chat.model.TipoDaMensagem;
+import com.lm.chat.model.ChatMessage;
+import com.lm.chat.model.MessageType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -15,7 +15,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @Slf4j
 public class WebSocketEventListener {
 
-    private final SimpMessageSendingOperations templateDaMensagem;
+    private final SimpMessageSendingOperations messagingTemplate;
 
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
@@ -24,11 +24,11 @@ public class WebSocketEventListener {
 
         if (username != null) {
             log.info("Usuario desconectou: {} ", username);
-            var mensagem = Mensagem.builder()
-                    .tipo(TipoDaMensagem.SAIU)
-                    .remetente(username)
+            var chatMessage = ChatMessage.builder()
+                    .type(MessageType.LEAVE)
+                    .sender(username)
                     .build();
-            templateDaMensagem.convertAndSend("/topic/public", mensagem);
+            messagingTemplate.convertAndSend("/topic/public", chatMessage);
         }
     }
 }
